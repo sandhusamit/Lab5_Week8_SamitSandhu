@@ -1,5 +1,6 @@
 package application;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 import javafx.application.Application;
@@ -43,6 +44,7 @@ public class Main extends Application {
         Label lastLbl = new Label("Last Name");
         TextField lastTxt = new TextField();
 
+
         VBox firstBox = new VBox(2, firstLbl, firstTxt);
         VBox lastBox = new VBox(2, lastLbl, lastTxt);
         HBox nameRow = new HBox(15, firstBox, lastBox);
@@ -52,6 +54,7 @@ public class Main extends Application {
         // === Email ===
         pane.add(new Label("Email"), 0, 1);
         TextField emailField = new TextField();
+
         pane.add(emailField, 0, 2, 2, 1);
 
         // === Position ===
@@ -62,15 +65,21 @@ public class Main extends Application {
         // === Phone + Start Date ===
         pane.add(new Label("Phone *"), 0, 5);
         TextField phoneField = new TextField();
+
         pane.add(phoneField, 0, 6);
 
-        pane.add(new Label("When Can You Start?"), 1, 5);
-        TextField startDateField = new TextField();
-        pane.add(startDateField, 1, 6);
+        pane.add(new Label("When Can You Start? YYY-MM-DD"), 1, 5);
 
+        DatePicker startDatePicker = new DatePicker();
+        pane.add(startDatePicker, 1, 6);
+
+
+        
+        
         // === Relocate ===
         pane.add(new Label("Willing to Relocate?"), 0, 7);
         ToggleGroup relocateGroup = new ToggleGroup();
+
         RadioButton yes = new RadioButton("Yes");
         RadioButton no = new RadioButton("No");
         RadioButton unsure = new RadioButton("Not Sure");
@@ -81,21 +90,34 @@ public class Main extends Application {
         relocateBox.setAlignment(Pos.CENTER_LEFT);
         pane.add(relocateBox, 0, 8, 2, 1);
 
+ 
         // === Comments ===
         pane.add(new Label("Comments"), 0, 9);
         TextArea ta = new TextArea();
+
         ta.setPrefRowCount(2);
         pane.add(ta, 0, 10, 2, 1);
 
         // === Button ===
         Button submitBtn = new Button("Send Application");
-        HBox btnBox = new HBox(submitBtn);
+        Button viewBtn = new Button("Review Application");
+        HBox btnBox = new HBox(submitBtn, viewBtn);
         btnBox.setAlignment(Pos.CENTER);
         btnBox.setPadding(new Insets(5, 0, 0, 0));
         pane.add(btnBox, 0, 11, 2, 1);
-        OKHandlerClass okHandler = new OKHandlerClass(); 
+        SQLManager sqlManager = new SQLManager();
+        
+     // Pass form controls, not their text
+        SubmitHandler submitHandler = new SubmitHandler(
+            firstTxt, lastTxt, emailField, positionField, phoneField,
+            startDatePicker, relocateGroup, ta
+        );
+
+        submitBtn.setOnAction(submitHandler);
+
+        
         // Event Handling
-        submitBtn.setOnAction(okHandler);        
+        submitBtn.setOnAction(submitHandler);        
         mainPane.setCenter(pane);
 
         // ===== Bottom Date =====
