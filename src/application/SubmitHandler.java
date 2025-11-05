@@ -3,6 +3,7 @@ package application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 
 import java.sql.Date;
 
@@ -51,9 +52,15 @@ public class SubmitHandler implements EventHandler<ActionEvent> {
 
             // Insert into database
             SQLManager sqlManager = new SQLManager();
-            sqlManager.insertApplication(firstName, lastName, email, position, phone, startDate, relocate, comments);
-
-            System.out.println("✅ Application submitted successfully!");
+            int id = sqlManager.insertApplication(firstName, lastName, email, position, phone, startDate, relocate, comments);
+            
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Application Submitted");
+            alert.setHeaderText("Application ID:" + id);
+            alert.setContentText("Save your application ID # for retrieval!");
+            alert.showAndWait();
+            
+            System.out.printf("✅ Application %d submitted successfully!", id);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("❌ Error submitting application.");

@@ -85,31 +85,44 @@ public class SQLManager {
 
         return applications;
     }
-    // Method to insert a new application
-    public boolean insertApplication(String firstName, String lastName, String email,
-                                     String position, String phone, java.sql.Date startDate,
-                                     String relocate, String comments) {
-        String query = "INSERT INTO applications (firstName, lastName, email, position, phone, startDate, relocate, comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    // Method to insert a new application and give back the id
+	public int insertApplication(String firstName, String lastName, String email,
+	                             String position, String phone, java.sql.Date startDate,
+	                             String relocate, String comments) {
+	
+	    String query = "INSERT INTO applications (firstName, lastName, email, position, phone, startDate, relocate, comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	    int generatedId = -1;
+	
+	    try (Connection con = DriverManager.getConnection(url, username, password);
+	         PreparedStatement pst = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+	
+	        pst.setString(1, firstName);
+	        pst.setString(2, lastName);
+	        pst.setString(3, email);
+	        pst.setString(4, position);
+	        pst.setString(5, phone);
+	        pst.setDate(6, startDate);
+	        pst.setString(7, relocate);
+	        pst.setString(8, comments);
+	
+	        int rowsAffected = pst.executeUpdate();
+	
+	        if (rowsAffected > 0) {
+	            try (ResultSet rs = pst.getGeneratedKeys()) {
+	                if (rs.next()) {
+	                    generatedId = rs.getInt(1); // ✅ Grab the auto-generated ID
+	                    System.out.println("✅ Insert successful! New application ID: " + generatedId);
+	                }
+	            }
+	        }
+	        
+	
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	
+	    return generatedId; // returns -1 if insert failed
+	}
 
-        try (Connection con = DriverManager.getConnection(url, username, password);
-             PreparedStatement pst = con.prepareStatement(query)) {
-
-            pst.setString(1, firstName);
-            pst.setString(2, lastName);
-            pst.setString(3, email);
-            pst.setString(4, position);
-            pst.setString(5, phone);
-            pst.setDate(6, startDate);
-            pst.setString(7, relocate);
-            pst.setString(8, comments);
-
-            int rowsAffected = pst.executeUpdate();
-            return rowsAffected > 0;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
 }

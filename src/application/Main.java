@@ -103,7 +103,7 @@ public class Main extends Application {
         Button submitBtn = new Button("Send Application");
         Button viewBtn = new Button("Review Application");
         Button clearBtn = new Button("Clear Application");
-        HBox btnBox = new HBox(submitBtn, viewBtn);
+        HBox btnBox = new HBox(submitBtn, viewBtn, clearBtn);
         btnBox.setAlignment(Pos.CENTER);
         btnBox.setPadding(new Insets(5, 0, 0, 0));
         pane.add(btnBox, 0, 11, 2, 1);
