@@ -8,66 +8,60 @@ import javafx.scene.control.TextInputDialog;
 
 public class ReaderHandler implements EventHandler<ActionEvent> {
 
-    public int id; 
-    public SQLManager sql = new SQLManager();
-    public EmploymentApplication application; // renamed to avoid JavaFX Application confusion
+    private int aid; 
+    private int eid; 
+    private final SQLManager sql = new SQLManager();
 
-    
+    private Applicant applicantInfo;
+    private SubjectEmployment employmentInfo;
+
     public ReaderHandler() {
-        promptForId();
-        
+        aid = promptForId("ApplicantID");
+        eid = promptForId("EmploymentID");
     }
 
-    private void promptForId() {
-    	this.id = 0;
-        boolean valid = false;
-        while (!valid) {
+    private int promptForId(String label) {
+        while (true) {
             TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Enter ID");
-            dialog.setHeaderText("Please enter the application ID:");
-            dialog.setContentText("ID:");
+            dialog.setTitle("Enter " + label);
+            dialog.setHeaderText("Please enter the " + label + ":");
+            dialog.setContentText(label + ":");
 
             Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()) {
-                try {
-                    id = Integer.parseInt(result.get());
-                    System.out.println("✅ ID set to: " + id);
-                    valid = true;
-                } catch (NumberFormatException e) {
-                    System.out.println("❌ Invalid input. Please enter an integer.");
-                }
-            } else {
-                System.out.println("❌ No ID entered. Exiting.");
-                id = -1;
-                valid = true; // or break, depending on how you want to handle cancel
+            if (!result.isPresent()) {
+                System.out.println("Cancelled.");
+                return -1;
             }
-            
+
+            try {
+                return Integer.parseInt(result.get());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number.");
+            }
         }
-		
     }
 
     @Override
     public void handle(ActionEvent event) {
+
         try {
-            if (id > 0) {
-                application = sql.getApplicationById(id);
-                if (application != null) {
-                    System.out.println("✅ Application fetched for ID: " + id);
-                } else {
-                    System.out.println("❌ No application found for ID: " + id);
-                }
-            }
+            if (aid > 0)
+                applicantInfo = sql.getApplicantById(aid);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("❌ Error fetching application.");
+            System.out.println("Error fetching applicant.");
+        }
+
+        try {
+            if (eid > 0)
+                employmentInfo = sql.getEmploymentById(eid);
+        } catch (Exception e) {
+            System.out.println("Error fetching employment.");
         }
     }
 
-    public int getId() {
-        return id;
-    }
+    public Applicant getApplicant() { return applicantInfo; }
+    public SubjectEmployment getEmployment() { return employmentInfo; }
 
-    public EmploymentApplication getApplication() {
-        return application;
-    }
+    public int getAID() { return aid; }
+    public int getEID() { return eid; }
 }
